@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>2026 성경읽기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#3182F6;
+  --blue-soft:#EBF3FE;
+  --blue-mid:#1B64DA;
+  --green:#00C471;
+  --green-soft:#E8FAF3;
+  --green-mid:#009E5B;
+  --red:#F04452;
+  --red-soft:#FEF0F1;
+  --bg:#F9FAFB;
+  --surface:#FFFFFF;
+  --border:#F2F4F6;
+  --border2:#E5E8EB;
+  --text1:#191F28;
+  --text2:#4E5968;
+  --text3:#8B95A1;
+  --sun-bg:#FFF0F3;
+  --sun-num:#F04452;
+  --sat-bg:#F0F5FF;
+  --sat-num:#3182F6;
+  --q1:#7B68EE;
+  --q2:#F5A623;
+  --q3:#44B89C;
+  --q4:#E85D7B;
+}
+
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+
+html,body {
+  background:var(--bg);
+  color:var(--text1);
+  font-family:'Noto Sans KR', -apple-system, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+/* ── 헤더 ── */
+header {
+  position:sticky; top:0; z-index:30;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:20px 20px 0;
+}
+.header-top {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px;
+}
+.header-title { font-size:18px; font-weight:700; color:var(--text1); }
+.header-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+#resetBtn {
+  border:none; background:var(--bg); color:var(--text2);
+  font-size:12px; font-weight:500;
+  padding:7px 12px; border-radius:8px; cursor:pointer;
+  font-family:inherit;
+  transition:background .12s;
+}
+#resetBtn:active { background:var(--border2); }
+
+.progress-section { padding-bottom:16px; }
+.progress-numbers {
+  display:flex; justify-content:space-between; align-items:baseline;
+  margin-bottom:8px;
+}
+.progress-label { font-size:13px; color:var(--text3); }
+.progress-count { font-size:13px; font-weight:600; color:var(--text1); }
+.progress-count b { font-size:22px; color:var(--blue); }
+.bar {
+  height:6px; border-radius:99px;
+  background:var(--border);
+}
+.bar > span {
+  display:block; height:100%; border-radius:99px;
+  background:var(--blue);
+  transition:width .4s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── 오늘 카드 ── */
+#todayWrap { padding:16px 20px 0; }
+.today-card {
+  background:var(--blue);
+  border-radius:16px;
+  padding:18px 18px 16px;
+  display:flex; align-items:center; gap:14px;
+  cursor:pointer; user-select:none;
+  transition:transform .1s, filter .1s;
+}
+.today-card:active { transform:scale(.985); filter:brightness(.95); }
+.today-card.done { background:var(--green); }
+.today-card.empty { cursor:default; background:var(--border2); }
+.tc-badge {
+  width:50px; height:50px; border-radius:14px;
+  background:rgba(255,255,255,.22);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.tc-badge-day { font-size:20px; font-weight:700; color:#fff; line-height:1; }
+.tc-badge-wd { font-size:10px; color:rgba(255,255,255,.8); margin-top:2px; }
+.today-card.empty .tc-badge-day { color:var(--text2); }
+.today-card.empty .tc-badge-wd { color:var(--text3); }
+.tc-body { flex:1; min-width:0; }
+.tc-eyebrow {
+  font-size:11px; font-weight:600; letter-spacing:.06em;
+  color:rgba(255,255,255,.8); margin-bottom:3px;
+}
+.today-card.empty .tc-eyebrow { color:var(--text3); }
+.tc-title { font-size:15px; font-weight:700; color:#fff; line-height:1.35; }
+.today-card.done .tc-title { text-decoration:line-through; text-decoration-color:rgba(255,255,255,.5); }
+.today-card.empty .tc-title { color:var(--text2); }
+.tc-date { font-size:11px; color:rgba(255,255,255,.7); margin-top:3px; }
+.today-card.empty .tc-date { color:var(--text3); }
+.tc-check {
+  width:28px; height:28px; border-radius:50%;
+  border:2px solid rgba(255,255,255,.5);
+  background:transparent;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all .15s;
+}
+.today-card.done .tc-check { background:#fff; border-color:#fff; }
+.tc-check svg { opacity:0; }
+.today-card.done .tc-check svg { opacity:1; }
+
+/* ── 탭 ── */
+nav.tabs {
+  position:sticky; z-index:25;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:8px 12px;
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap:6px;
+}
+nav.tabs button {
+  font-family:inherit;
+  font-size:13px; font-weight:500;
+  padding:8px 4px;
+  border:none; border-radius:10px;
+  background:var(--bg);
+  color:var(--text3);
+  cursor:pointer; white-space:nowrap;
+  transition:background .15s, color .15s;
+  position:relative;
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+}
+nav.tabs button.active {
+  background:var(--blue); color:#fff; font-weight:700;
+}
+nav.tabs button .dot {
+  display:block; width:5px; height:5px; border-radius:50%;
+  background:var(--green);
+  opacity:0; transition:opacity .15s;
+}
+nav.tabs button.active .dot { background:rgba(255,255,255,.8); }
+nav.tabs button.complete .dot { opacity:1; }
+
+/* ── 본문 ── */
+main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
+
+.month-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 0 14px;
+}
+.month-name { font-size:17px; font-weight:700; }
+.month-stats { font-size:13px; color:var(--text3); font-weight:500; }
+.month-stats b { color:var(--text1); font-weight:700; }
+
+/* ── 일별 행 ── */
+.day-row {
+  display:flex; align-items:center; gap:14px;
+  padding:12px 14px;
+  border-radius:14px;
+  cursor:pointer; user-select:none;
+  margin-bottom:4px;
+  background:var(--surface);
+  transition:background .1s;
+}
+.day-row:active { background:var(--bg); }
+
+/* 일/토 배경 */
+.day-row.sunday { background:var(--sun-bg); }
+.day-row.saturday { background:var(--sat-bg); }
+.day-row.sunday:active { background:#fce4e8; }
+.day-row.saturday:active { background:#e2ecff; }
+
+.day-num {
+  flex:0 0 36px; height:36px; border-radius:10px;
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:700; color:var(--text2);
+  transition:all .15s;
+}
+.day-row.sunday .day-num { background:rgba(240,68,82,.1); color:var(--sun-num); }
+.day-row.saturday .day-num { background:rgba(49,130,246,.12); color:var(--sat-num); }
+
+.day-body { flex:1; min-width:0; }
+.day-text { font-size:14px; font-weight:500; color:var(--text1); line-height:1.4; }
+.day-tag {
+  display:inline-flex; align-items:center; gap:4px;
+  margin-top:5px;
+  font-size:11px; font-weight:600; color:var(--blue);
+  background:var(--blue-soft);
+  border-radius:6px; padding:3px 8px;
+  text-decoration:none;
+  transition:background .1s;
+}
+.day-tag:active { background:#d6e8fd; }
+.play-icon { width:10px; height:10px; }
+
+.check {
+  flex:0 0 22px; height:22px; border-radius:6px;
+  border:1.5px solid var(--border2);
+  background:transparent;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.check svg { opacity:0; transition:opacity .12s; }
+
+/* 완료 상태 */
+.day-row.done .day-num { background:var(--green); color:#fff; }
+.day-row.done .day-text { color:var(--text3); text-decoration:line-through; text-decoration-color:var(--border2); }
+.day-row.done .check { background:var(--green); border-color:var(--green); }
+.day-row.done .check svg { opacity:1; }
+.day-row.done .day-tag { opacity:.5; }
+
+/* 오늘 */
+.day-row.today { background:var(--blue-soft); }
+.day-row.today:active { background:#daeafe; }
+.day-row.today .day-num { background:var(--blue); color:#fff; position:relative; }
+.day-row.today .day-num::after {
+  content:"오늘";
+  position:absolute; top:-11px; left:50%; transform:translateX(-50%);
+  font-size:9px; font-weight:700; color:#fff;
+  background:var(--blue); border-radius:99px; padding:1px 5px;
+  white-space:nowrap;
+}
+
+/* 휴일 */
+.day-row.note { cursor:default; background:transparent; }
+.day-row.note:active { background:transparent; }
+.day-row.note .day-num { background:transparent; border:1.5px dashed var(--border2); color:var(--text3); }
+.day-row.note .day-text { color:var(--text3); font-style:italic; }
+.day-row.note .check { visibility:hidden; }
+
+/* 섹션 구분선 */
+.section-divider {
+  height:1px; background:var(--border);
+  margin:8px 0 12px;
+}
+
+footer {
+  text-align:center; font-size:12px; color:var(--text3);
+  padding:20px 20px 40px; line-height:1.8;
+}
+.video-accent { color:var(--blue); font-weight:600; }
+</style>
+</head>
+<body>
+
+<noscript>
+  <div style="padding:40px 20px;text-align:center;font-family:sans-serif;color:#191F28;">
+    <p style="font-weight:700;font-size:1.1rem;">자바스크립트가 필요합니다</p>
+    <p style="color:#8B95A1;font-size:.9rem;margin-top:8px;line-height:1.6;">
+      파일 앱에 저장 후, 공유 버튼 → <b>Safari로 열기</b>를 선택해 주세요.
+    </p>
+  </div>
+</noscript>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="header-title">성경읽기 통독표</div>
+      <div class="header-sub">2026 · 그리스도 중심 · BON Church</div>
+    </div>
+    <button id="resetBtn">초기화</button>
+  </div>
+  <div class="progress-section">
+    <div class="progress-numbers">
+      <span class="progress-label">올해 진행률</span>
+      <span class="progress-count"><b id="totalDone">0</b> / <span id="totalCount">0</span>일</span>
+    </div>
+    <div class="bar"><span id="totalBar" style="width:0%"></span></div>
+  </div>
+</header>
+
+<div id="todayWrap"></div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<main id="content"></main>
+
+<footer>
+  날짜를 탭하면 읽기 완료로 체크돼요.<br>
+  <span class="video-accent">▶ 영상</span>이 있는 날은 영상을 먼저 시청한 뒤 체크하세요.<br>
+  체크 내용은 이 기기 브라우저에만 저장됩니다.
+</footer>
+
+<script>
+const V = {
+  intro:"https://www.youtube.com/watch?v=LLu2xB_rIT4",
+  v1_1:"https://www.youtube.com/watch?v=LLu2xB_rIT4&list=PL68UlTaS5lt8th0r_EvnfEvvTzaJuYNa3&index=2",
+  v1_2:"https://www.youtube.com/watch?v=yUeqd5_MsFY&list=PL68UlTaS5lt8th0r_EvnfEvvTzaJuYNa3&index=9",
+  v1_3:"https://www.youtube.com/watch?v=nuumvEm2D9M&list=PL68UlTaS5lt8th0r_EvnfEvvTzaJuYNa3&index=16",
+  v1_4:"https://www.youtube.com/watch?v=4Ttqlz3qR8Q&list=PL68UlTaS5lt8th0r_EvnfEvvTzaJuYNa3&index=23",
+  v1_5:"https://www.youtube.com/watch?v=ODkCppuCsAA&list=PL68UlTaS5lt8th0r_EvnfEvvTzaJuYNa3&index=30",
+  v1_6:"https://www.youtube.com/watch?v=nrGJvJz9WHI&list=PL68UlTaS5lt8th0r_EvnfEvvTzaJuYNa3&index=37",
+  v1_7:"https://www.youtube.com/watch?v=Eb6jCXeDHCg&list=PL68UlTaS5lt8th0r_EvnfEvvTzaJuYNa3&index=44",
+  v2_1:"https://www.youtube.com/watch?v=A4BVjXOnJXY&list=PL68UlTaS5lt9L2bTJ2MgN2q9yeniRGfDJ&index=1",
+  v2_2:"https://www.youtube.com/watch?v=YLuWUTeCltc&list=PL68UlTaS5lt9L2bTJ2MgN2q9yeniRGfDJ&index=2",
+  v2_3:"https://www.youtube.com/watch?v=MVQgiGHrMec&list=PL68UlTaS5lt9L2bTJ2MgN2q9yeniRGfDJ&index=3",
+  v2_4:"https://www.youtube.com/watch?v=OFxFwWNMEjw&list=PL68UlTaS5lt9L2bTJ2MgN2q9yeniRGfDJ&index=4",
+  v2_5:"https://www.youtube.com/watch?v=DATMW23HVm4&list=PL68UlTaS5lt9L2bTJ2MgN2q9yeniRGfDJ&index=5",
+  v2_6:"https://www.youtube.com/watch?v=BxFFHUtlaSM&list=PL68UlTaS5lt9L2bTJ2MgN2q9yeniRGfDJ&index=6",
+  v2_7:"https://www.youtube.com/watch?v=MIZFwFNaFkk&list=PL68UlTaS5lt9L2bTJ2MgN2q9yeniRGfDJ&index=7",
+  v3_1:"https://www.youtube.com/watch?v=py_S7ICqOyQ&list=PL68UlTaS5lt8TnLXkwLEdBrlfTe0souaZ",
+  v3_2:"https://www.youtube.com/watch?v=dDzzD_vu0JI&list=PL68UlTaS5lt8TnLXkwLEdBrlfTe0souaZ&index=2",
+  v3_3:"https://www.youtube.com/watch?v=3js4uGzvsJY&list=PL68UlTaS5lt8TnLXkwLEdBrlfTe0souaZ&index=3",
+  v3_4:"https://www.youtube.com/watch?v=HlB72y13ork&list=PL68UlTaS5lt8TnLXkwLEdBrlfTe0souaZ&index=4",
+  v3_5:"https://www.youtube.com/watch?v=bDPOFSHgkQA&list=PL68UlTaS5lt8TnLXkwLEdBrlfTe0souaZ&index=5",
+  v3_6:"https://www.youtube.com/watch?v=l8uNGDL9T0w&list=PL68UlTaS5lt8TnLXkwLEdBrlfTe0souaZ&index=6",
+  v3_7:"https://www.youtube.com/watch?v=QIATHwMWS-I&list=PL68UlTaS5lt8TnLXkwLEdBrlfTe0souaZ&index=7",
+  v4_1:"https://www.youtube.com/watch?v=kRhEyqzxqUs&list=PL68UlTaS5lt_TgyJYCLq1YFL-mX3xdju4",
+  v4_2:"https://youtu.be/MBoaA_5sid0?si=pZ3QDBRqMJol_v7y",
+  v4_2b:"https://www.youtube.com/watch?v=MBoaA_5sid0&list=PL68UlTaS5lt_TgyJYCLq1YFL-mX3xdju4&index=2",
+  v4_3:"https://www.youtube.com/watch?v=t7MwSpxihPk&list=PL68UlTaS5lt_TgyJYCLq1YFL-mX3xdju4&index=3",
+  v4_4:"https://www.youtube.com/watch?v=ytn1zktdYzM&list=PL68UlTaS5lt_TgyJYCLq1YFL-mX3xdju4&index=4",
+  v4_5:"https://www.youtube.com/watch?v=4jdhnOw9rLw&list=PL68UlTaS5lt_TgyJYCLq1YFL-mX3xdju4&index=5",
+  v5_1:"https://www.youtube.com/watch?v=aV-7QO8KdnY&list=PL68UlTaS5lt9rtUI4WkOYKTp_GcxpFRTH&index=1",
+  v5_2:"https://www.youtube.com/watch?v=1AuD1F7RaDw&list=PL68UlTaS5lt9rtUI4WkOYKTp_GcxpFRTH&index=2",
+  v5_3:"https://www.youtube.com/watch?v=9j9RhkVMoKw&list=PL68UlTaS5lt9rtUI4WkOYKTp_GcxpFRTH&index=3",
+  v5_4:"https://www.youtube.com/watch?v=7AlFvpeVHXI&list=PL68UlTaS5lt9rtUI4WkOYKTp_GcxpFRTH&index=4",
+  v5_5:"https://www.youtube.com/watch?v=ovYiJ_q0aMg&list=PL68UlTaS5lt9rtUI4WkOYKTp_GcxpFRTH&index=5",
+  v5_6:"https://www.youtube.com/watch?v=heD3yyHR77c&list=PL68UlTaS5lt9rtUI4WkOYKTp_GcxpFRTH&index=6",
+  v5_7:"https://www.youtube.com/watch?v=cUYgRHn7lOk&list=PL68UlTaS5lt9rtUI4WkOYKTp_GcxpFRTH&index=7",
+  v6_1:"https://www.youtube.com/watch?v=w6Zsa0LU7AE&list=PL68UlTaS5lt8qnnszSEa5TapJjzlvxEoW&index=1",
+  v6_2:"https://www.youtube.com/watch?v=aP08iEL7vdQ&list=PL68UlTaS5lt8qnnszSEa5TapJjzlvxEoW&index=2",
+  v6_3:"https://www.youtube.com/watch?v=IvcfBnhTAGE&list=PL68UlTaS5lt8qnnszSEa5TapJjzlvxEoW&index=3",
+  v6_4:"https://www.youtube.com/watch?v=9coXCovH_Kc&list=PL68UlTaS5lt8qnnszSEa5TapJjzlvxEoW&index=4",
+  v6_5:"https://www.youtube.com/watch?v=yxTmK4m2ekM&list=PL68UlTaS5lt8qnnszSEa5TapJjzlvxEoW&index=5",
+  v6_6:"https://www.youtube.com/watch?v=imWjNPHxDyc&list=PL68UlTaS5lt8qnnszSEa5TapJjzlvxEoW&index=6",
+  v6_7:"https://www.youtube.com/watch?v=7hQSOYCETPE&list=PL68UlTaS5lt8qnnszSEa5TapJjzlvxEoW&index=7"
+};
+
+const MONTHS = [
+{ name:"1월", q:"q1", days:[
+  [4,"성경읽기표 안내"],
+  [12,"구약개관","intro"],
+  [13,"1-1. 창세기 1","v1_1"],
+  [14,"창 1~4"],[15,"창 5~8"],[16,"창 9~12"],[17,"창 13~16"],[18,"창 17~20"],[19,"창 21~24"],
+  [20,"1-2. 창세기 2","v1_2"],
+  [21,"창 25~28"],[22,"창 29~32"],[23,"창 33~36"],[24,"창 37~40"],[25,"창 41~45"],[26,"창 46~50"],
+  [27,"1-3. 출애굽기","v1_3"],
+  [28,"출 1~6"],[29,"출 7~12"],[30,"출 13~19"],[31,"출 20~26"]
+]},
+{ name:"2월", q:"q1", days:[
+  [1,"출 27~33"],[2,"출 34~40"],
+  [3,"1-4. 레위기","v1_4"],
+  [4,"레 1~5"],[5,"레 6~10"],[6,"레 11~15"],[7,"레 16~20"],[8,"레 21~25"],[9,"레 26~27"],
+  [10,"1-5. 민수기","v1_5"],
+  [11,"민 1~6"],[12,"민 7~12"],[13,"민 13~18"],[14,"민 19~24"],
+  [15,"설날 연휴",null,"note"],[16,"설날 연휴",null,"note"],[17,"설날 연휴",null,"note"],[18,"설날 연휴",null,"note"],
+  [19,"민 25~30"],[20,"민 31~36"],
+  [21,"1-6. 신명기","v1_6"],
+  [22,"신 1~6"],[23,"신 7~12"],[24,"신 13~18"],[25,"신 19~24"],[26,"신 25~29"],[27,"신 30~34"],
+  [28,"1-7. 여호수아","v1_7"]
+]},
+{ name:"3월", q:"q1", days:[
+  [1,"수 1~4"],[2,"수 5~8"],[3,"수 9~12"],[4,"수 13~16"],[5,"수 17~20"],[6,"수 21~24"],
+  [7,"2-1. 사사기","v2_1"],
+  [8,"삿 1~4"],[9,"삿 5~8"],[10,"삿 9~12"],[11,"삿 13~16"],[12,"삿 17~21"],[13,"룻 1~4"],
+  [14,"2-2. 사무엘상하 1","v2_2"],
+  [15,"삼상 1~5"],[16,"삼상 6~10"],[17,"삼상 11~15"],[18,"삼상 16~20"],[19,"삼상 21~25"],[20,"삼상 26~31"],
+  [21,"2-3. 사무엘상하 2","v2_3"],
+  [22,"삼하 1~4"],[23,"삼하 5~8"],[24,"삼하 9~12"],[25,"삼하 13~16"],[26,"삼하 17~20"],[27,"삼하 21~24"],
+  [28,"2-4. 열왕기상하","v2_4"],
+  [29,"왕상 1~4"],[30,"왕상 5~7"],[31,"왕상 8~10"]
+]},
+{ name:"4월", q:"q2", days:[
+  [1,"왕상 11~14"],[2,"왕상 15~18"],[3,"왕상 19~22"],
+  [4,"2-4. 열왕기상하 (복습)","v2_4"],
+  [5,"왕하 1~4"],[6,"왕하 5~8"],[7,"왕하 9~12"],[8,"왕하 13~16"],[9,"왕하 17~20"],[10,"왕하 21~25"],
+  [11,"2-5. 역대상하","v2_5"],
+  [12,"대상 1~5"],[13,"대상 6~10"],[14,"대상 11~15"],[15,"대상 16~20"],[16,"대상 21~25"],[17,"대상 26~29"],
+  [18,"2-6. 유배기","v2_6"],
+  [19,"대하 1~6"],[20,"대하 7~12"],[21,"대하 13~18"],[22,"대하 19~24"],[23,"대하 25~30"],[24,"대하 31~36"],
+  [25,"2-7. 에스라·느헤미야·에스더","v2_7"],
+  [26,"스 1~5"],[27,"스 6~10"],[28,"느 1~6"],[29,"느 7~13"],[30,"에 1~5"]
+]},
+{ name:"5월", q:"q2", days:[
+  [1,"에 6~10"],
+  [2,"3-1. 욥기","v3_1"],
+  [3,"욥 1~7"],[4,"욥 8~14"],[5,"욥 15~21"],[6,"욥 22~28"],[7,"욥 29~35"],[8,"욥 36~42"],
+  [9,"3-2. 시편 1","v3_2"],
+  [10,"시 1~6"],[11,"시 7~12"],[12,"시 13~18"],[13,"시 19~24"],[14,"시 25~30"],[15,"시 31~36"],
+  [16,"3-3. 시편 2","v3_3"],
+  [17,"시 37~42"],[18,"시 43~48"],[19,"시 49~54"],[20,"시 55~60"],[21,"시 61~66"],[22,"시 67~72"],
+  [23,"3-4. 시편 3","v3_4"],
+  [24,"시 73~78"],[25,"시 79~84"],[26,"시 85~90"],[27,"시 91~96"],[28,"시 97~102"],[29,"시 103~109"],
+  [30,"3-5. 시편 4","v3_5"],
+  [31,"시 110~115"]
+]},
+{ name:"6월", q:"q2", days:[
+  [1,"시 116~120"],[2,"시 121~125"],[3,"시 126~130"],[4,"시 131~140"],[5,"시 141~150"],
+  [6,"3-6. 잠언","v3_6"],
+  [7,"잠 1~5"],[8,"잠 6~10"],[9,"잠 11~15"],[10,"잠 16~20"],[11,"잠 21~25"],[12,"잠 26~31"],
+  [13,"3-7. 전도서·아가","v3_7"],
+  [14,"전 1~3"],[15,"전 4~6"],[16,"전 7~9"],[17,"전 10~12"],[18,"아 1~4"],[19,"아 5~8"],
+  [20,"4-1. 이사야 a","v4_1"],
+  [21,"사 1~5"],[22,"사 6~10"],[23,"사 11~15"],[24,"사 16~20"],[25,"사 21~25"],[26,"사 26~30"],
+  [27,"4-1. 이사야 b","v4_1"],
+  [28,"사 31~36"],[29,"사 37~42"],[30,"사 43~48"]
+]},
+{ name:"7월", q:"q3", days:[
+  [1,"사 49~54"],[2,"사 55~60"],[3,"사 61~66"],
+  [4,"4-2. 예레미야","v4_2"],
+  [5,"렘 1~5"],[6,"렘 6~10"],[7,"렘 11~15"],[8,"렘 16~20"],[9,"렘 21~25"],[10,"렘 26~30"],
+  [11,"4-2. 예레미야·예레미야애가","v4_2b"],
+  [12,"렘 31~35"],[13,"렘 36~40"],[14,"렘 41~45"],[15,"렘 46~50"],[16,"렘 51~52"],[17,"애 1~5"],
+  [18,"4-3. 에스겔 a","v4_3"],
+  [19,"겔 1~4"],[20,"겔 5~8"],[21,"겔 9~12"],[22,"겔 13~16"],[23,"겔 17~20"],[24,"겔 21~24"],
+  [25,"4-3. 에스겔 b","v4_3"],
+  [26,"겔 25~28"],[27,"겔 29~32"],[28,"겔 33~36"],[29,"겔 37~40"],[30,"겔 41~44"],[31,"겔 45~48"]
+]},
+{ name:"8월", q:"q3", days:[
+  [1,"4-4. 다니엘·호세아","v4_4"],
+  [2,"단 1~4"],[3,"단 5~8"],[4,"단 9~12"],[5,"호 1~5"],[6,"호 6~10"],[7,"호 11~14"],
+  [8,"4-5. 소선지서 a","v4_5"],
+  [9,"욜 1~암 3"],[10,"암 4~9"],[11,"옵 1~욘 4"],[12,"미 1~7"],[13,"나 1~합 3"],[14,"습 1~3"],
+  [15,"4-5. 소선지서 b","v4_5"],
+  [16,"학 1~2"],[17,"슥 1~5"],[18,"슥 6~10"],[19,"슥 11~14"],[20,"말 1~2"],[21,"말 3~4"],
+  [22,"5-1. 복음서 1","v5_1"],
+  [23,"마 1~3"],[24,"마 4~6"],[25,"마 7~9"],[26,"마 10~12"],[27,"마 13~15"],[28,"마 16~18"],
+  [29,"5-2. 복음서 2","v5_2"],
+  [30,"마 19~21"],[31,"마 22~24"]
+]},
+{ name:"9월", q:"q3", days:[
+  [1,"마 25~28"],[2,"막 1~5"],[3,"막 6~10"],[4,"막 11~16"],
+  [5,"5-3. 복음서 3","v5_3"],
+  [6,"눅 1~4"],[7,"눅 5~8"],[8,"눅 9~12"],[9,"눅 13~16"],[10,"눅 17~20"],[11,"눅 21~24"],
+  [12,"5-4. 복음서 4","v5_4"],
+  [13,"요 1~4"],[14,"요 5~8"],[15,"요 9~12"],[16,"요 13~16"],[17,"요 17~19"],[18,"요 20~21"],
+  [19,"5-5. 사도행전 1","v5_5"],
+  [20,"행 1~3"],[21,"행 4~5"],[22,"행 6~8"],[23,"행 9~10"],
+  [24,"추석 연휴",null,"note"],[25,"추석 연휴",null,"note"],[26,"추석 연휴",null,"note"],
+  [27,"행 11~13"],[28,"행 14~15"],
+  [29,"5-6. 사도행전 2","v5_6"],
+  [30,"행 16~18"]
+]},
+{ name:"10월", q:"q4", days:[
+  [1,"행 19~20"],[2,"행 21~22"],[3,"행 23~24"],[4,"행 25~26"],[5,"행 27~28"],
+  [6,"5-7. 로마서","v5_7"],
+  [7,"롬 1~3"],[8,"롬 4~6"],[9,"롬 7~8"],[10,"롬 9~11"],[11,"롬 12~14"],[12,"롬 15~16"],
+  [13,"6-1. 바울서신 1","v6_1"],
+  [14,"고전 1~4"],[15,"고전 5~8"],[16,"고전 9~12"],[17,"고전 13~15"],[18,"고후 1~3"],[19,"고후 4~6"],
+  [20,"6-2. 바울서신 2","v6_2"],
+  [21,"고후 7~9"],[22,"고후 10~13"],[23,"갈 1~6"],[24,"엡 1~3"],[25,"엡 4~6"],[26,"빌 1~4"],
+  [27,"6-3. 바울서신 3","v6_3"],
+  [28,"골 1~4"],[29,"살전 1~5"],[30,"살후 1~3"],[31,"딤전 1~6"]
+]},
+{ name:"11월", q:"q4", days:[
+  [1,"딤후 1~4"],[2,"딛~몬"],
+  [3,"6-4. 일반서신 1 (히)","v6_4"],
+  [4,"히 1~3"],[5,"히 4~6"],[6,"히 7~9"],[7,"히 10~13"],[8,"약 1~3"],[9,"약 4~5"],
+  [10,"6-5. 일반서신 2 (요일)","v6_5"],
+  [11,"벧전 1~5"],[12,"벧후 1~3"],[13,"요일 1~3"],[14,"요일 4~5"],[15,"요이~요삼"],[16,"유다서"],
+  [17,"6-6. 요한계시록 1","v6_6"],
+  [18,"계 1"],[19,"계 2~3"],[20,"계 4~5"],[21,"계 6~7"],[22,"계 8~9"],[23,"계 10~11"],
+  [24,"6-7. 요한계시록 2","v6_7"],
+  [25,"계 12~13"],[26,"계 14~15"],[27,"계 16~17"],[28,"계 18~19"],[29,"계 20~21"],[30,"계 22"]
+]},
+{ name:"12월", q:"q4", days:[
+  [16,"전체 복습"]
+]}
+];
+
+const STORAGE_KEY = "bible2026_checks";
+let checks = {};
+try { checks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){ checks = {}; }
+function saveChecks(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(checks)); }
+
+const WDAYS = ["일","월","화","수","목","금","토"];
+const now = new Date();
+const todayMonth = now.getMonth()+1;
+const todayDay = now.getDate();
+let activeMonth = (todayMonth >= 1 && todayMonth <= 12) ? (todayMonth-1) : 0;
+
+const CHECK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${activeMonth >= 0 ? '#fff' : '#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg>`;
+const CHECK_SVG_GREEN = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg>`;
+const PLAY_SVG = `<svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>`;
+
+/* ── 성경 약어 → 전체 이름 ── */
+const BIBLE_ABBR = {
+  "창":"창세기","출":"출애굽기","레":"레위기","민":"민수기","신":"신명기",
+  "수":"여호수아","삿":"사사기","룻":"룻기",
+  "삼상":"사무엘상","삼하":"사무엘하",
+  "왕상":"열왕기상","왕하":"열왕기하",
+  "대상":"역대상","대하":"역대하",
+  "스":"에스라","느":"느헤미야","에":"에스더",
+  "욥":"욥기","시":"시편","잠":"잠언","전":"전도서","아":"아가",
+  "사":"이사야","렘":"예레미야","애":"예레미야애가","겔":"에스겔","단":"다니엘",
+  "호":"호세아","욜":"요엘","암":"아모스","옵":"오바댜","욘":"요나",
+  "미":"미가","나":"나훔","합":"하박국","습":"스바냐","학":"학개",
+  "슥":"스가랴","말":"말라기",
+  "마":"마태복음","막":"마가복음","눅":"누가복음","요":"요한복음",
+  "행":"사도행전","롬":"로마서",
+  "고전":"고린도전서","고후":"고린도후서",
+  "갈":"갈라디아서","엡":"에베소서","빌":"빌립보서","골":"골로새서",
+  "살전":"데살로니가전서","살후":"데살로니가후서",
+  "딤전":"디모데전서","딤후":"디모데후서",
+  "딛":"디도서","몬":"빌레몬서","히":"히브리서",
+  "약":"야고보서","벧전":"베드로전서","벧후":"베드로후서",
+  "요일":"요한일서","요이":"요한이서","요삼":"요한삼서",
+  "유":"유다서","계":"요한계시록"
+};
+
+function expandBible(text) {
+  /* "창 1~4" → "창세기 1~4", "딛~몬" → "디도서~빌레몬서" 등 처리 */
+  return text.replace(/([가-힣]+)/g, (match) => BIBLE_ABBR[match] || match);
+}
+
+const tabsEl = document.getElementById('tabs');
+const contentEl = document.getElementById('content');
+
+function checkableEntries(mi){ return MONTHS[mi].days.filter(d => d[3] !== "note"); }
+function isDone(mi, day){ return !!checks[mi+"-"+day]; }
+function monthStats(mi){
+  const e = checkableEntries(mi);
+  return { done: e.filter(x => isDone(mi, x[0])).length, total: e.length };
+}
+
+function renderTabs(){
+  tabsEl.innerHTML = "";
+  MONTHS.forEach((m, idx) => {
+    const btn = document.createElement('button');
+    const s = monthStats(idx);
+    const isComplete = s.done === s.total && s.total > 0;
+    btn.className = (idx === activeMonth ? "active" : "") + (isComplete ? " complete" : "");
+    btn.innerHTML = m.name + '<span class="dot"></span>';
+    btn.addEventListener('click', () => { activeMonth = idx; renderAll(); });
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderMonth(){
+  contentEl.innerHTML = "";
+  const m = MONTHS[activeMonth];
+  const s = monthStats(activeMonth);
+
+  const head = document.createElement('div');
+  head.className = "month-header";
+  head.innerHTML = `<span class="month-name">${m.name}</span><span class="month-stats"><b>${s.done}</b> / ${s.total}일 완료</span>`;
+  contentEl.appendChild(head);
+
+  if (m.days.length === 0){
+    const p = document.createElement('div');
+    p.style.cssText = "padding:20px 0;font-size:14px;color:var(--text3);";
+    p.textContent = "이 달은 별도의 읽기 일정이 없습니다.";
+    contentEl.appendChild(p);
+    return;
+  }
+
+  m.days.forEach(([day, text, videoKey, flag]) => {
+    const done = isDone(activeMonth, day);
+    const isToday = (activeMonth+1 === todayMonth) && (day === todayDay);
+    const dow = new Date(2026, activeMonth, day).getDay();
+    const weekClass = dow === 0 ? " sunday" : dow === 6 ? " saturday" : "";
+
+    const row = document.createElement('div');
+    row.className = "day-row" + (done?" done":"") + (isToday?" today":"") + (flag==="note"?" note":"") + weekClass;
+
+    const num = document.createElement('div');
+    num.className = "day-num";
+    num.textContent = day;
+
+    const body = document.createElement('div');
+    body.className = "day-body";
+    const txt = document.createElement('div');
+    txt.className = "day-text";
+    txt.textContent = expandBible(text);
+    body.appendChild(txt);
+
+    if (videoKey && V[videoKey]){
+      const a = document.createElement('a');
+      a.className = "day-tag";
+      a.href = V[videoKey];
+      a.target = "_blank"; a.rel = "noopener";
+      a.innerHTML = PLAY_SVG + " 영상";
+      a.addEventListener('click', e => e.stopPropagation());
+      body.appendChild(a);
+    }
+
+    const chk = document.createElement('div');
+    chk.className = "check";
+    chk.innerHTML = CHECK_SVG_GREEN;
+
+    row.appendChild(num);
+    row.appendChild(body);
+    row.appendChild(chk);
+
+    if (flag !== "note"){
+      row.addEventListener('click', () => {
+        const key = activeMonth+"-"+day;
+        checks[key] = !checks[key];
+        if (!checks[key]) delete checks[key];
+        saveChecks(); renderAll();
+      });
+    }
+    contentEl.appendChild(row);
+  });
+}
+
+function renderTotals(){
+  let done=0, total=0;
+  MONTHS.forEach((m,i) => { const s=monthStats(i); done+=s.done; total+=s.total; });
+  document.getElementById('totalDone').textContent = done;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('totalBar').style.width = (total ? done/total*100 : 0)+"%";
+}
+
+function renderTodayCard(){
+  const wrap = document.getElementById('todayWrap');
+  if (todayMonth < 1 || todayMonth > 12){ wrap.innerHTML=""; return; }
+  const mi = todayMonth-1;
+  const entry = MONTHS[mi].days.find(d => d[0]===todayDay);
+  const wd = WDAYS[now.getDay()];
+  const dateStr = `${todayMonth}월 ${todayDay}일 (${wd})`;
+
+  if (!entry){
+    wrap.innerHTML = `
+      <div style="padding:16px 20px 0">
+        <div class="today-card empty">
+          <div class="tc-badge"><div class="tc-badge-day" style="color:var(--text2)">${todayDay}</div><div class="tc-badge-wd" style="color:var(--text3)">${wd}</div></div>
+          <div class="tc-body">
+            <div class="tc-eyebrow" style="color:var(--text3)">오늘의 말씀</div>
+            <div class="tc-title" style="color:var(--text2);font-weight:500">오늘은 읽기 일정이 없어요</div>
+            <div class="tc-date" style="color:var(--text3)">${dateStr}</div>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const [day, text, videoKey, flag] = entry;
+  const done = isDone(mi, day);
+  const isNote = flag==="note";
+
+  wrap.innerHTML = `
+    <div style="padding:16px 20px 0">
+      <div class="today-card ${done?'done':''} ${isNote?'empty':''}" id="todayCardInner">
+        <div class="tc-badge">
+          <div class="tc-badge-day">${day}</div>
+          <div class="tc-badge-wd">${wd}</div>
+        </div>
+        <div class="tc-body">
+          <div class="tc-eyebrow">오늘의 말씀</div>
+          <div class="tc-title">${expandBible(text)}</div>
+          <div class="tc-date">${dateStr}</div>
+        </div>
+        ${isNote ? '' : `<div class="tc-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${done?'#00C471':'#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg></div>`}
+      </div>
+    </div>`;
+
+  if (!isNote){
+    document.getElementById('todayCardInner').addEventListener('click', () => {
+      const key = mi+"-"+day;
+      checks[key] = !checks[key];
+      if (!checks[key]) delete checks[key];
+      saveChecks(); renderAll();
+    });
+  }
+}
+
+function syncTabsTop(){
+  const h = document.querySelector('header');
+  tabsEl.style.top = h.offsetHeight+'px';
+}
+window.addEventListener('resize', syncTabsTop);
+
+function renderAll(){
+  renderTabs();
+  renderMonth();
+  renderTotals();
+  renderTodayCard();
+  syncTabsTop();
+}
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm("모든 체크를 초기화할까요?\n이 작업은 되돌릴 수 없습니다.")){
+    checks = {}; saveChecks(); renderAll();
+  }
+});
+
+renderAll();
+</script>
+</body>
+</html>
