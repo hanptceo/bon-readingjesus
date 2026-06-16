@@ -224,6 +224,10 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
   display:flex; align-items:center; justify-content:center;
   transition:all .15s;
 }
+.check-stamp {
+  font-size:11px; color:rgba(255,255,255,.8);
+  font-weight:500; white-space:nowrap; flex-shrink:0;
+}
 .check svg { opacity:0; transition:opacity .12s; }
 
 /* 완료 상태 */
@@ -621,13 +625,25 @@ function renderMonth(){
 
     row.appendChild(num);
     row.appendChild(body);
+
+    if (done && typeof checks[activeMonth+"-"+day] === "string") {
+      const stamp = document.createElement('div');
+      stamp.className = "check-stamp";
+      stamp.textContent = checks[activeMonth+"-"+day];
+      row.appendChild(stamp);
+    }
+
     row.appendChild(chk);
 
     if (flag !== "note"){
       row.addEventListener('click', () => {
         const key = activeMonth+"-"+day;
-        checks[key] = !checks[key];
-        if (!checks[key]) delete checks[key];
+        if (checks[key]) {
+          delete checks[key];
+        } else {
+          const now2 = new Date();
+          checks[key] = `${now2.getMonth()+1}/${now2.getDate()} ${String(now2.getHours()).padStart(2,'0')}:${String(now2.getMinutes()).padStart(2,'0')}`;
+        }
         saveChecks(); renderAll();
       });
     }
@@ -689,8 +705,12 @@ function renderTodayCard(){
   if (!isNote){
     document.getElementById('todayCardInner').addEventListener('click', () => {
       const key = mi+"-"+day;
-      checks[key] = !checks[key];
-      if (!checks[key]) delete checks[key];
+      if (checks[key]) {
+        delete checks[key];
+      } else {
+        const now2 = new Date();
+        checks[key] = `${now2.getMonth()+1}/${now2.getDate()} ${String(now2.getHours()).padStart(2,'0')}:${String(now2.getMinutes()).padStart(2,'0')}`;
+      }
       saveChecks(); renderAll();
     });
   }
