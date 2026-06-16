@@ -9,29 +9,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --blue:#3182F6;
-  --blue-soft:#EBF3FE;
-  --blue-mid:#1B64DA;
-  --green:#00C471;
-  --green-soft:#E8FAF3;
-  --green-mid:#009E5B;
-  --red:#F04452;
-  --red-soft:#FEF0F1;
-  --bg:#F9FAFB;
+  --blue:#F97316;
+  --blue-soft:#FFF3E8;
+  --blue-mid:#EA6A00;
+  --green:#F97316;
+  --green-soft:#FFF3E8;
+  --green-mid:#EA6A00;
+  --red:#E85D3A;
+  --red-soft:#FEF0EC;
+  --bg:#F5F5F4;
   --surface:#FFFFFF;
-  --border:#F2F4F6;
-  --border2:#E5E8EB;
-  --text1:#191F28;
-  --text2:#4E5968;
-  --text3:#8B95A1;
-  --sun-bg:#FFF0F3;
-  --sun-num:#F04452;
-  --sat-bg:#F0F5FF;
-  --sat-num:#3182F6;
-  --q1:#7B68EE;
-  --q2:#F5A623;
-  --q3:#44B89C;
-  --q4:#E85D7B;
+  --border:#E7E5E4;
+  --border2:#D6D3D1;
+  --text1:#1C1917;
+  --text2:#44403C;
+  --text3:#A8A29E;
+  --sun-bg:#FFF0F0;
+  --sun-num:#D63030;
+  --sat-bg:#EFF4FF;
+  --sat-num:#3B6FD4;
+  --q1:#F97316;
+  --q2:#FB923C;
+  --q3:#FDBA74;
+  --q4:#EA6A00;
 }
 
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
@@ -49,7 +49,7 @@ header {
   position:sticky; top:0; z-index:30;
   background:var(--surface);
   border-bottom:1px solid var(--border);
-  padding:20px 20px 0;
+  padding:20px 10px 0;
 }
 .header-top {
   display:flex; align-items:center; justify-content:space-between;
@@ -85,7 +85,7 @@ header {
 }
 
 /* ── 오늘 카드 ── */
-#todayWrap { padding:16px 20px 0; }
+#todayWrap { padding:12px 2px 16px; }
 .today-card {
   background:var(--blue);
   border-radius:16px;
@@ -134,22 +134,22 @@ nav.tabs {
   position:sticky; z-index:25;
   background:var(--surface);
   border-bottom:1px solid var(--border);
-  padding:8px 12px;
+  padding:6px 12px;
   display:grid;
   grid-template-columns: repeat(6, 1fr);
-  gap:6px;
+  gap:5px;
 }
 nav.tabs button {
   font-family:inherit;
-  font-size:13px; font-weight:500;
-  padding:8px 4px;
+  font-size:12px; font-weight:500;
+  padding:4px 4px;
   border:none; border-radius:10px;
   background:var(--bg);
   color:var(--text3);
   cursor:pointer; white-space:nowrap;
   transition:background .15s, color .15s;
   position:relative;
-  display:flex; flex-direction:column; align-items:center; gap:4px;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
 }
 nav.tabs button.active {
   background:var(--blue); color:#fff; font-weight:700;
@@ -181,15 +181,16 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
   cursor:pointer; user-select:none;
   margin-bottom:4px;
   background:var(--surface);
+  border:1px solid #E0DDDB;
   transition:background .1s;
 }
 .day-row:active { background:var(--bg); }
 
 /* 일/토 배경 */
-.day-row.sunday { background:var(--sun-bg); }
-.day-row.saturday { background:var(--sat-bg); }
-.day-row.sunday:active { background:#fce4e8; }
-.day-row.saturday:active { background:#e2ecff; }
+.day-row.sunday { background:var(--sun-bg); border:1px solid #F5B8B8; }
+.day-row.saturday { background:var(--sat-bg); border:1px solid #B8CFEF; }
+.day-row.sunday:active { background:#fcd8d8; }
+.day-row.saturday:active { background:#dce8ff; }
 
 .day-num {
   flex:0 0 36px; height:36px; border-radius:10px;
@@ -198,19 +199,19 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
   font-size:14px; font-weight:700; color:var(--text2);
   transition:all .15s;
 }
-.day-row.sunday .day-num { background:rgba(240,68,82,.1); color:var(--sun-num); }
-.day-row.saturday .day-num { background:rgba(49,130,246,.12); color:var(--sat-num); }
+.day-row.sunday .day-num { background:rgba(214,48,48,.1); color:var(--sun-num); }
+.day-row.saturday .day-num { background:rgba(59,111,212,.12); color:var(--sat-num); }
 
 .day-body { flex:1; min-width:0; }
 .day-text { font-size:14px; font-weight:500; color:var(--text1); line-height:1.4; }
 .day-tag {
   display:inline-flex; align-items:center; gap:4px;
-  margin-top:5px;
   font-size:11px; font-weight:600; color:var(--blue);
   background:var(--blue-soft);
   border-radius:6px; padding:3px 8px;
   text-decoration:none;
   transition:background .1s;
+  white-space:nowrap;
 }
 .day-tag:active { background:#d6e8fd; }
 .play-icon { width:10px; height:10px; }
@@ -289,9 +290,8 @@ footer {
     </div>
     <div class="bar"><span id="totalBar" style="width:0%"></span></div>
   </div>
+  <div id="todayWrap"></div>
 </header>
-
-<div id="todayWrap"></div>
 
 <nav class="tabs" id="tabs"></nav>
 
@@ -494,7 +494,7 @@ let activeMonth = (todayMonth >= 1 && todayMonth <= 12) ? (todayMonth-1) : 0;
 
 const CHECK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${activeMonth >= 0 ? '#fff' : '#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg>`;
 const CHECK_SVG_GREEN = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg>`;
-const PLAY_SVG = `<svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20"/></svg>`;
+const PLAY_SVG = `<svg width="14" height="10" viewBox="0 0 24 17" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="17" rx="4" fill="#FF0000"/><polygon points="9.5,4.5 9.5,12.5 17,8.5" fill="#fff"/></svg>`;
 
 /* ── 성경 약어 → 전체 이름 ── */
 const BIBLE_ABBR = {
@@ -582,19 +582,27 @@ function renderMonth(){
 
     const body = document.createElement('div');
     body.className = "day-body";
-    const txt = document.createElement('div');
-    txt.className = "day-text";
-    txt.textContent = expandBible(text);
-    body.appendChild(txt);
 
     if (videoKey && V[videoKey]){
+      const wrap = document.createElement('div');
+      wrap.style.cssText = "display:flex;align-items:center;gap:6px;flex-wrap:wrap;";
+      const txt = document.createElement('span');
+      txt.className = "day-text";
+      txt.textContent = expandBible(text);
       const a = document.createElement('a');
       a.className = "day-tag";
       a.href = V[videoKey];
       a.target = "_blank"; a.rel = "noopener";
       a.innerHTML = PLAY_SVG + " 영상";
       a.addEventListener('click', e => e.stopPropagation());
-      body.appendChild(a);
+      wrap.appendChild(txt);
+      wrap.appendChild(a);
+      body.appendChild(wrap);
+    } else {
+      const txt = document.createElement('div');
+      txt.className = "day-text";
+      txt.textContent = expandBible(text);
+      body.appendChild(txt);
     }
 
     const chk = document.createElement('div');
@@ -635,7 +643,7 @@ function renderTodayCard(){
 
   if (!entry){
     wrap.innerHTML = `
-      <div style="padding:16px 20px 0">
+      <div>
         <div class="today-card empty">
           <div class="tc-badge"><div class="tc-badge-day" style="color:var(--text2)">${todayDay}</div><div class="tc-badge-wd" style="color:var(--text3)">${wd}</div></div>
           <div class="tc-body">
@@ -653,7 +661,7 @@ function renderTodayCard(){
   const isNote = flag==="note";
 
   wrap.innerHTML = `
-    <div style="padding:16px 20px 0">
+    <div>
       <div class="today-card ${done?'done':''} ${isNote?'empty':''}" id="todayCardInner">
         <div class="tc-badge">
           <div class="tc-badge-day">${day}</div>
@@ -664,7 +672,7 @@ function renderTodayCard(){
           <div class="tc-title">${expandBible(text)}</div>
           <div class="tc-date">${dateStr}</div>
         </div>
-        ${isNote ? '' : `<div class="tc-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${done?'#00C471':'#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg></div>`}
+        ${isNote ? '' : `<div class="tc-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${done?'#F97316':'#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg></div>`}
       </div>
     </div>`;
 
