@@ -95,7 +95,7 @@ header {
   transition:transform .1s, filter .1s;
 }
 .today-card:active { transform:scale(.985); filter:brightness(.95); }
-.today-card.done { background:var(--green); }
+.today-card.done { background:#00C471; }
 .today-card.empty { cursor:default; background:var(--border2); }
 .tc-badge {
   width:50px; height:50px; border-radius:14px;
@@ -114,7 +114,7 @@ header {
 }
 .today-card.empty .tc-eyebrow { color:var(--text3); }
 .tc-title { font-size:15px; font-weight:700; color:#fff; line-height:1.35; }
-.today-card.done .tc-title { text-decoration:line-through; text-decoration-color:rgba(255,255,255,.5); }
+.today-card.done .tc-title { color:#fff; }
 .today-card.empty .tc-title { color:var(--text2); }
 .tc-date { font-size:11px; color:rgba(255,255,255,.7); margin-top:3px; }
 .today-card.empty .tc-date { color:var(--text3); }
@@ -149,7 +149,7 @@ nav.tabs button {
   cursor:pointer; white-space:nowrap;
   transition:background .15s, color .15s;
   position:relative;
-  display:flex; flex-direction:column; align-items:center; gap:3px;
+  display:flex; align-items:center; justify-content:center;
 }
 nav.tabs button.active {
   background:var(--blue); color:#fff; font-weight:700;
@@ -158,6 +158,7 @@ nav.tabs button .dot {
   display:block; width:5px; height:5px; border-radius:50%;
   background:var(--green);
   opacity:0; transition:opacity .15s;
+  position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
 }
 nav.tabs button.active .dot { background:rgba(255,255,255,.8); }
 nav.tabs button.complete .dot { opacity:1; }
@@ -226,14 +227,17 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
 .check svg { opacity:0; transition:opacity .12s; }
 
 /* 완료 상태 */
-.day-row.done .day-num { background:var(--green); color:#fff; }
-.day-row.done .day-text { color:var(--text3); text-decoration:line-through; text-decoration-color:var(--border2); }
-.day-row.done .check { background:var(--green); border-color:var(--green); }
+.day-row.done { background:#00C471; border-color:#00A85E; }
+.day-row.done .day-num { background:#00C471; color:#fff; border:1.5px solid rgba(255,255,255,.7); }
+.day-row.done.sunday .day-num { background:rgba(214,48,48,.1); color:var(--sun-num); border:1.5px solid rgba(255,255,255,.7); }
+.day-row.done.saturday .day-num { background:rgba(59,111,212,.12); color:var(--sat-num); border:1.5px solid rgba(255,255,255,.7); }
+.day-row.done .day-text { color:rgba(255,255,255,.8); }
+.day-row.done .check { background:#00C471; border-color:#fff; }
 .day-row.done .check svg { opacity:1; }
 .day-row.done .day-tag { opacity:.5; }
 
 /* 오늘 */
-.day-row.today { background:var(--blue-soft); }
+.day-row.today { background:var(--blue-soft); border-color:#B8CFEF; }
 .day-row.today:active { background:#daeafe; }
 .day-row.today .day-num { background:var(--blue); color:#fff; position:relative; }
 .day-row.today .day-num::after {
@@ -243,6 +247,12 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
   background:var(--blue); border-radius:99px; padding:1px 5px;
   white-space:nowrap;
 }
+
+/* 오늘 + 완료 */
+.day-row.today.done { background:#00C471; border-color:#00A85E; }
+.day-row.today.done .day-num { background:var(--blue); color:#fff; border:1.5px solid rgba(255,255,255,.7); }
+.day-row.today.done .day-text { color:rgba(255,255,255,.9); }
+.day-row.today.done .check { background:#00C471; border-color:#fff; }
 
 /* 휴일 */
 .day-row.note { cursor:default; background:transparent; }
@@ -672,7 +682,7 @@ function renderTodayCard(){
           <div class="tc-title">${expandBible(text)}</div>
           <div class="tc-date">${dateStr}</div>
         </div>
-        ${isNote ? '' : `<div class="tc-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${done?'#F97316':'#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg></div>`}
+        ${isNote ? '' : `<div class="tc-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${done?'#00C471':'#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg></div>`}
       </div>
     </div>`;
 
