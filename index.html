@@ -295,7 +295,7 @@ footer {
       <div class="header-title">리딩지저스 성경읽기 통독표</div>
       <div class="header-sub">2026 · 그리스도 중심 · 본교회</div>
     </div>
-    <button id="resetBtn">초기화</button>
+    <a href="prayer-note.html" style="border:none;background:var(--blue);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;text-decoration:none;transition:background .12s;">기도노트</a>
   </div>
   <div class="progress-section">
     <div class="progress-numbers">
@@ -314,7 +314,8 @@ footer {
 <footer>
   날짜를 탭하면 읽기 완료로 체크돼요.<br>
   <span class="video-accent">▶ 영상</span>이 있는 날은 영상을 먼저 시청한 뒤 체크하세요.<br>
-  체크 내용은 이 기기 브라우저에만 저장됩니다.
+  체크 내용은 이 기기 브라우저에만 저장됩니다.<br><br>
+  <button id="resetBtn">초기화</button>
 </footer>
 
 <script>
@@ -506,7 +507,6 @@ const todayMonth = now.getMonth()+1;
 const todayDay = now.getDate();
 let activeMonth = (todayMonth >= 1 && todayMonth <= 12) ? (todayMonth-1) : 0;
 
-const CHECK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${activeMonth >= 0 ? '#fff' : '#fff'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg>`;
 const CHECK_SVG_GREEN = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 18 20 6"/></svg>`;
 const PLAY_SVG = `<svg width="14" height="10" viewBox="0 0 24 17" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="17" rx="4" fill="#FF0000"/><polygon points="9.5,4.5 9.5,12.5 17,8.5" fill="#fff"/></svg>`;
 

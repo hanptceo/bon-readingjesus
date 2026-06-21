@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>기도노트 · 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#F97316;
+  --blue-soft:#FFF3E8;
+  --blue-mid:#EA6A00;
+  --green:#00C471;
+  --green-soft:#E6FAF2;
+  --red:#E85D3A;
+  --red-soft:#FEF0EC;
+  --bg:#F5F5F4;
+  --surface:#FFFFFF;
+  --border:#E7E5E4;
+  --border2:#D6D3D1;
+  --text1:#1C1917;
+  --text2:#44403C;
+  --text3:#A8A29E;
+}
+
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0; }
+html,body {
+  background:var(--bg);
+  color:var(--text1);
+  font-family:'Noto Sans KR', -apple-system, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+/* ── 헤더 ── */
+header {
+  position:sticky; top:0; z-index:30;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:20px 16px 16px;
+}
+.header-top { display:flex; align-items:center; justify-content:space-between; }
+.header-title { font-size:18px; font-weight:700; color:var(--text1); }
+.header-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+
+/* ── 월 탭 (2줄, 6×2) ── */
+nav.tabs {
+  position:sticky; z-index:25;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:8px 12px;
+  display:grid;
+  grid-template-columns:repeat(6, 1fr);
+  gap:5px;
+}
+nav.tabs button {
+  font-family:inherit; font-size:12px; font-weight:500;
+  padding:5px 4px; border:none; border-radius:10px;
+  background:var(--bg); color:var(--text3);
+  cursor:pointer; white-space:nowrap;
+  transition:background .15s, color .15s;
+}
+nav.tabs button.active { background:var(--blue); color:#fff; font-weight:700; }
+
+/* ── 본문 ── */
+main { padding:16px 16px 80px; max-width:640px; margin:0 auto; }
+
+/* ── 추가 버튼 ── */
+.add-btn {
+  display:flex; align-items:center; justify-content:center;
+  width:100%; background:var(--blue); color:#fff;
+  border:none; border-radius:12px;
+  font-family:inherit; font-size:14px; font-weight:700;
+  padding:13px; cursor:pointer; margin-bottom:16px;
+  transition:filter .1s;
+}
+.add-btn:active { filter:brightness(.92); }
+
+/* ── 기도 목록 ── */
+.prayer-list { display:flex; flex-direction:column; gap:8px; }
+
+.prayer-item {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px; overflow:hidden;
+}
+.prayer-item.answered { border-color:#A3E9CB; background:var(--green-soft); }
+
+.prayer-row {
+  display:flex; align-items:center; gap:8px;
+  padding:13px 14px;
+}
+.prayer-seq {
+  flex-shrink:0; width:26px; height:26px; border-radius:8px;
+  background:var(--blue-soft); color:var(--blue);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700;
+}
+.prayer-item.answered .prayer-seq { background:#d0f5e8; color:#1a7a50; }
+
+.prayer-main { flex:1; min-width:0; }
+.prayer-title-text {
+  font-size:14px; font-weight:500; color:var(--text1); line-height:1.4;
+}
+.prayer-item.answered .prayer-title-text { color:#1a7a50; }
+
+.answer-badge {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:11px; font-weight:700; color:var(--green);
+  background:#d0f5e8; border-radius:6px;
+  padding:2px 7px; margin-top:4px;
+}
+
+.answer-display {
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:5px;
+  font-size:13px; color:#1a7a50;
+  margin-top:5px; line-height:1.5;
+}
+.answer-display .answer-when { font-weight:600; }
+
+.prayer-btns { display:flex; gap:4px; flex-shrink:0; }
+.prayer-btns button {
+  width:28px; height:28px; padding:0; border:none;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:8px; cursor:pointer; transition:background .12s;
+}
+.btn-edit { background:var(--bg); color:var(--text2); }
+.btn-edit:active { background:var(--border); }
+.btn-delete { background:var(--red-soft); color:var(--red); }
+.btn-delete:active { background:#fcd5cc; }
+
+/* ── 빈 상태 ── */
+.empty-state {
+  text-align:center; padding:50px 20px;
+  color:var(--text3); font-size:14px; line-height:1.8;
+}
+
+/* ── 추가/수정 모달 패널 ── */
+#overlay {
+  position:fixed;
+  left:0; right:0; bottom:0;
+  z-index:100;
+  background:var(--surface);
+  overflow-y:auto;
+  display:none;
+  box-shadow:0 -4px 24px rgba(0,0,0,.12);
+}
+#overlay.show { display:block; }
+#overlay .modal {
+  border-radius:0;
+  max-height:none;
+  padding:20px 20px 60px;
+}
+.modal-title { font-size:17px; font-weight:700; color:var(--text1); margin-bottom:20px; }
+.form-label {
+  font-size:12px; font-weight:600; color:var(--text3);
+  letter-spacing:.05em; margin-bottom:6px; display:block;
+}
+.form-input, .form-textarea {
+  width:100%; font-family:inherit; font-size:14px;
+  border:1.5px solid var(--border2); border-radius:10px;
+  padding:11px 13px; background:var(--bg); color:var(--text1);
+  outline:none; transition:border-color .15s; margin-bottom:14px;
+}
+.form-input:focus, .form-textarea:focus { border-color:var(--blue); }
+.form-textarea { min-height:90px; resize:vertical; }
+.modal-divider {
+  height:1px; background:var(--border); margin:4px 0 16px;
+}
+.modal-section-title {
+  font-size:12px; font-weight:700; color:var(--text3);
+  letter-spacing:.06em; margin-bottom:12px;
+}
+.modal-actions { display:flex; gap:8px; margin-top:4px; }
+.btn-modal-cancel {
+  flex:1; font-family:inherit; font-size:14px; font-weight:600;
+  padding:13px; border-radius:12px;
+  border:1.5px solid var(--border2); background:var(--bg); color:var(--text2);
+  cursor:pointer;
+}
+.btn-modal-save {
+  flex:2; font-family:inherit; font-size:14px; font-weight:700;
+  padding:13px; border-radius:12px;
+  border:none; background:var(--blue); color:#fff; cursor:pointer;
+}
+.btn-modal-save:active { filter:brightness(.92); }
+
+/* ── 응답목록 패널 ── */
+#answerListOverlay {
+  position:fixed;
+  left:0; right:0; bottom:0;
+  z-index:100;
+  background:var(--surface);
+  overflow-y:auto;
+  display:none;
+  box-shadow:0 -4px 24px rgba(0,0,0,.12);
+}
+#answerListOverlay.show { display:block; }
+#answerListOverlay .modal {
+  border-radius:0;
+  max-height:none;
+  padding:20px 20px 60px;
+}
+
+/* ── 응답목록 아이템 ── */
+.ans-list-empty {
+  text-align:center; padding:40px 0;
+  font-size:14px; color:var(--text3); line-height:1.8;
+}
+.ans-month-group { margin-bottom:18px; }
+.ans-month-label {
+  font-size:12px; font-weight:700; color:var(--text3);
+  letter-spacing:.05em; margin-bottom:8px;
+}
+.ans-item {
+  background:var(--green-soft);
+  border:1px solid #A3E9CB;
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:6px;
+}
+.ans-item-title {
+  font-size:14px; font-weight:600; color:#1a7a50; line-height:1.4;
+  display:flex; align-items:center; gap:7px;
+}
+.ans-item-title .answer-badge {
+  font-size:10px; padding:2px 6px;
+}
+.ans-item-detail {
+  display:flex; align-items:baseline; flex-wrap:wrap; gap:5px;
+  font-size:13px; color:#2e7d5a; margin-top:5px; line-height:1.5;
+}
+.ans-item-detail .answer-when { font-weight:600; }
+
+footer {
+  text-align:center; font-size:12px; color:var(--text3);
+  padding:20px 20px 40px; line-height:1.8;
+}
+#resetBtn {
+  border:none; background:var(--bg); color:var(--text2);
+  font-size:12px; font-weight:500;
+  padding:7px 12px; border-radius:8px; cursor:pointer;
+  font-family:inherit; transition:background .12s;
+}
+#resetBtn:active { background:var(--border2); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="header-title">기도노트</div>
+      <div class="header-sub">2026 · 그리스도 중심 · 본교회</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="answerListBtn" style="background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;">응답목록</button>
+      <a href="index.html" style="background:var(--blue);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;text-decoration:none;font-family:inherit;">통독표</a>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+<main id="content"></main>
+
+<!-- 응답목록 패널 -->
+<div id="answerListOverlay">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div class="modal-title" style="margin-bottom:0;">응답 목록</div>
+      <button id="answerListClose" style="background:var(--bg);border:none;border-radius:8px;padding:6px 12px;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;">닫기</button>
+    </div>
+    <div id="answerListContent"></div>
+  </div>
+</div>
+
+<!-- 기도 추가/수정 팝업 모달 -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">기도 제목 추가</div>
+
+    <label class="form-label">기도 제목</label>
+    <input class="form-input" id="modalInputTitle" type="text" placeholder="기도 제목을 입력하세요">
+
+    <!-- 수정 모드에서만 표시 -->
+    <div id="answerSection" style="display:none;">
+      <div class="modal-divider"></div>
+      <div class="modal-section-title">응답 기록</div>
+      <label class="form-label">응답 시기</label>
+      <input class="form-input" id="modalInputWhen" type="text" placeholder="예) 2026년 3월, 봄">
+      <label class="form-label">응답 내용</label>
+      <textarea class="form-textarea" id="modalInputContent" placeholder="응답 내용을 자유롭게 적어주세요"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="modalCancel">취소</button>
+      <button class="btn-modal-save" id="modalSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  체크 내용은 이 기기 브라우저에만 저장됩니다.<br><br>
+  <button id="resetBtn">초기화</button>
+</footer>
+
+<script>
+const STORAGE_KEY = "prayer2026_notes";
+const MONTH_NAMES = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+
+let data = {};
+try {
+  const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if(raw && typeof raw === 'object' && !Array.isArray(raw)) data = raw;
+} catch(e){}
+for(let i = 0; i < 12; i++) if(!Array.isArray(data[i])) data[i] = [];
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
+function escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const now = new Date();
+let activeMonth = now.getMonth();
+
+/* ── 모달 ── */
+const overlay       = document.getElementById('overlay');
+const modalTitle    = document.getElementById('modalTitle');
+const modalInputTitle   = document.getElementById('modalInputTitle');
+const modalInputWhen    = document.getElementById('modalInputWhen');
+const modalInputContent = document.getElementById('modalInputContent');
+const answerSection = document.getElementById('answerSection');
+
+let editingIdx = null;
+
+function setOverlayTop(){
+  const addBtn = document.querySelector('.add-btn');
+  if(addBtn){
+    const rect = addBtn.getBoundingClientRect();
+    overlay.style.top = (rect.bottom + 6) + 'px';
+  }
+}
+
+function openAddModal(){
+  editingIdx = null;
+  modalTitle.textContent = '기도 제목 추가';
+  modalInputTitle.value = '';
+  modalInputWhen.value = '';
+  modalInputContent.value = '';
+  answerSection.style.display = 'none';
+  setOverlayTop();
+  overlay.classList.add('show');
+  setTimeout(() => modalInputTitle.focus(), 120);
+}
+
+function openEditModal(idx){
+  const p = data[activeMonth][idx];
+  editingIdx = idx;
+  modalTitle.textContent = '기도 제목 수정';
+  modalInputTitle.value = p.title;
+  modalInputWhen.value = p.answeredWhen || '';
+  modalInputContent.value = p.answeredContent || '';
+  answerSection.style.display = 'block';
+  setOverlayTop();
+  overlay.classList.add('show');
+  setTimeout(() => modalInputTitle.focus(), 120);
+}
+
+function closeModal(){ overlay.classList.remove('show'); editingIdx = null; }
+
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+
+document.getElementById('modalSave').addEventListener('click', () => {
+  const title = modalInputTitle.value.trim();
+  if(!title){ modalInputTitle.focus(); return; }
+
+  if(editingIdx === null){
+    data[activeMonth].push({ id:genId(), title, answeredWhen:'', answeredContent:'' });
+  } else {
+    const p = data[activeMonth][editingIdx];
+    p.title = title;
+    p.answeredWhen = modalInputWhen.value.trim();
+    p.answeredContent = modalInputContent.value.trim();
+  }
+  save(); closeModal(); renderContent();
+});
+
+/* ── 탭 ── */
+function renderTabs(){
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = '';
+  MONTH_NAMES.forEach((name, idx) => {
+    const btn = document.createElement('button');
+    btn.textContent = name;
+    if(idx === activeMonth) btn.classList.add('active');
+    btn.addEventListener('click', () => { activeMonth = idx; renderAll(); });
+    tabsEl.appendChild(btn);
+  });
+}
+
+/* ── 본문 ── */
+function renderContent(){
+  const contentEl = document.getElementById('content');
+  contentEl.innerHTML = '';
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-btn';
+  addBtn.textContent = '+ 기도 제목 추가';
+  addBtn.addEventListener('click', openAddModal);
+  contentEl.appendChild(addBtn);
+
+  const prayers = data[activeMonth];
+
+  if(prayers.length === 0){
+    const emp = document.createElement('div');
+    emp.className = 'empty-state';
+    emp.textContent = '이 달의 기도 제목이 없습니다.\n위 버튼을 눌러 추가해보세요.';
+    contentEl.appendChild(emp);
+    return;
+  }
+
+  const list = document.createElement('div');
+  list.className = 'prayer-list';
+
+  prayers.forEach((prayer, idx) => {
+    const hasAnswer = !!(prayer.answeredWhen || prayer.answeredContent);
+
+    const item = document.createElement('div');
+    item.className = 'prayer-item' + (hasAnswer ? ' answered' : '');
+
+    const row = document.createElement('div');
+    row.className = 'prayer-row';
+
+    const seqEl = document.createElement('div');
+    seqEl.className = 'prayer-seq';
+    seqEl.textContent = idx + 1;
+
+    const mainEl = document.createElement('div');
+    mainEl.className = 'prayer-main';
+    mainEl.innerHTML = `<div class="prayer-title-text">${escHtml(prayer.title)}</div>`;
+
+    if(hasAnswer){
+      mainEl.innerHTML += `<div class="answer-display"><span class="answer-badge">응답 ✓</span>${prayer.answeredWhen ? `<span class="answer-when">${escHtml(prayer.answeredWhen)}</span>` : ''}${prayer.answeredContent ? escHtml(prayer.answeredContent) : ''}</div>`;
+    }
+
+    const btns = document.createElement('div');
+    btns.className = 'prayer-btns';
+    btns.innerHTML = `
+      <button class="btn-edit" title="수정"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="btn-delete" title="삭제"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`;
+
+    btns.querySelector('.btn-edit').addEventListener('click', () => openEditModal(idx));
+    btns.querySelector('.btn-delete').addEventListener('click', () => {
+      if(confirm('이 기도 제목을 삭제할까요?')){
+        data[activeMonth].splice(idx, 1);
+        save(); renderContent();
+      }
+    });
+
+    row.appendChild(seqEl);
+    row.appendChild(mainEl);
+    row.appendChild(btns);
+    item.appendChild(row);
+    list.appendChild(item);
+  });
+
+  contentEl.appendChild(list);
+}
+
+function syncTabsTop(){
+  document.querySelector('nav.tabs').style.top = document.querySelector('header').offsetHeight + 'px';
+}
+
+/* ── 응답목록 팝업 ── */
+const answerListOverlay = document.getElementById('answerListOverlay');
+
+function setAnswerListTop(){
+  const h = document.querySelector('header').offsetHeight;
+  answerListOverlay.style.top = h + 'px';
+}
+
+document.getElementById('answerListBtn').addEventListener('click', () => {
+  setAnswerListTop();
+  const listEl = document.getElementById('answerListContent');
+  listEl.innerHTML = '';
+
+  let totalCount = 0;
+  const groups = [];
+
+  MONTH_NAMES.forEach((name, mi) => {
+    const answered = (data[mi] || []).filter(p => p.answeredWhen || p.answeredContent);
+    if(answered.length > 0){
+      groups.push({ name, mi, items: answered });
+      totalCount += answered.length;
+    }
+  });
+
+  if(totalCount === 0){
+    listEl.innerHTML = `<div class="ans-list-empty">아직 응답된 기도가 없습니다.<br>수정 화면에서 응답 내용을 입력해보세요.</div>`;
+  } else {
+    groups.forEach(g => {
+      const group = document.createElement('div');
+      group.className = 'ans-month-group';
+      group.innerHTML = `<div class="ans-month-label">${g.name} · ${g.items.length}건</div>`;
+
+      g.items.forEach(p => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'ans-item';
+        itemEl.innerHTML = `
+          <div class="ans-item-title">${escHtml(p.title)}</div>
+          <div class="ans-item-detail">
+            <span class="answer-badge">응답 ✓</span>
+            ${p.answeredWhen ? `<span class="answer-when">${escHtml(p.answeredWhen)}</span>` : ''}
+            ${p.answeredContent ? escHtml(p.answeredContent) : ''}
+          </div>`;
+        group.appendChild(itemEl);
+      });
+
+      listEl.appendChild(group);
+    });
+  }
+
+  answerListOverlay.classList.add('show');
+});
+
+document.getElementById('answerListClose').addEventListener('click', () => {
+  answerListOverlay.classList.remove('show');
+});
+window.addEventListener('resize', () => { if(answerListOverlay.classList.contains('show')) setAnswerListTop(); });
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if(confirm('모든 기도 내용을 초기화할까요?\n이 작업은 되돌릴 수 없습니다.')){
+    for(let i = 0; i < 12; i++) data[i] = [];
+    save(); renderAll();
+  }
+});
+
+function renderAll(){ renderTabs(); renderContent(); syncTabsTop(); }
+window.addEventListener('resize', syncTabsTop);
+renderAll();
+</script>
+</body>
+</html>
