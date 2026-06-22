@@ -115,7 +115,7 @@ header {
   color:rgba(255,255,255,.8); margin-bottom:3px;
 }
 .today-card.empty .tc-eyebrow { color:var(--text3); }
-.tc-title { font-size:15px; font-weight:700; color:#fff; line-height:1.35; }
+.tc-title { font-size:16px; font-weight:700; color:#fff; line-height:1.35; }
 .today-card.done .tc-title { color:#fff; }
 .today-card.empty .tc-title { color:var(--text2); }
 .tc-date { font-size:11px; color:rgba(255,255,255,.7); margin-top:3px; }
@@ -178,8 +178,8 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
 
 /* ── 일별 행 ── */
 .day-row {
-  display:flex; align-items:center; gap:14px;
-  padding:12px 14px;
+  display:flex; align-items:center; gap:11px;
+  padding:10px 14px;
   border-radius:14px;
   cursor:pointer; user-select:none;
   margin-bottom:4px;
@@ -196,20 +196,20 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
 .day-row.saturday:active { background:#dce8ff; }
 
 .day-num {
-  flex:0 0 36px; height:36px; border-radius:10px;
+  flex:0 0 29px; height:29px; border-radius:8px;
   background:var(--bg);
   display:flex; align-items:center; justify-content:center;
-  font-size:14px; font-weight:700; color:var(--text2);
+  font-size:15px; font-weight:700; color:var(--text2);
   transition:all .15s;
 }
 .day-row.sunday .day-num { background:rgba(214,48,48,.1); color:var(--sun-num); }
 .day-row.saturday .day-num { background:rgba(59,111,212,.12); color:var(--sat-num); }
 
 .day-body { flex:1; min-width:0; }
-.day-text { font-size:14px; font-weight:500; color:var(--text1); line-height:1.4; }
+.day-text { font-size:15px; font-weight:500; color:var(--text1); line-height:1.4; }
 .day-tag {
   display:inline-flex; align-items:center; gap:4px;
-  font-size:11px; font-weight:600; color:var(--blue);
+  font-size:12px; font-weight:600; color:var(--blue);
   background:var(--blue-soft);
   border-radius:6px; padding:3px 8px;
   text-decoration:none;
@@ -220,14 +220,14 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
 .play-icon { width:10px; height:10px; }
 
 .check {
-  flex:0 0 22px; height:22px; border-radius:6px;
+  flex:0 0 18px; height:18px; border-radius:4px;
   border:1.5px solid var(--border2);
   background:transparent;
   display:flex; align-items:center; justify-content:center;
   transition:all .15s;
 }
 .check-stamp {
-  font-size:11px; color:rgba(255,255,255,.8);
+  font-size:12px; color:rgba(255,255,255,.8);
   font-weight:500; white-space:nowrap; flex-shrink:0;
 }
 .check svg { opacity:0; transition:opacity .12s; }
@@ -249,7 +249,7 @@ main { padding:16px 20px 100px; max-width:640px; margin:0 auto; }
 .day-row.today .day-num::after {
   content:"오늘";
   position:absolute; top:-11px; left:50%; transform:translateX(-50%);
-  font-size:9px; font-weight:700; color:#fff;
+  font-size:10px; font-weight:700; color:#fff;
   background:var(--blue); border-radius:99px; padding:1px 5px;
   white-space:nowrap;
 }
@@ -317,7 +317,8 @@ footer {
   날짜를 탭하면 읽기 완료로 체크돼요.<br>
   <span class="video-accent">▶ 영상</span>이 있는 날은 영상을 먼저 시청한 뒤 체크하세요.<br>
   체크 내용은 이 기기 브라우저에만 저장됩니다.<br><br>
-  <button id="resetBtn">초기화</button>
+  <button id="resetBtn">초기화</button><br>
+  Last updated 2026.06.22
 </footer>
 
 <script>

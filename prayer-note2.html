@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>기도노트 · 2026</title>
+<title>기도노트 · 시작일 맞춤</title>
 <link rel="icon" type="image/png" href="bible-app-icon.png">
 <link rel="apple-touch-icon" href="bible-app-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +36,6 @@ html,body {
   min-height:100vh;
 }
 
-/* ── 헤더 ── */
 header {
   position:sticky; top:0; z-index:30;
   background:var(--surface);
@@ -47,7 +46,6 @@ header {
 .header-title { font-size:18px; font-weight:700; color:var(--text1); }
 .header-sub { font-size:12px; color:var(--text3); margin-top:2px; }
 
-/* ── 월 탭 (2줄, 6×2) ── */
 nav.tabs {
   position:sticky; z-index:25;
   background:var(--surface);
@@ -66,10 +64,8 @@ nav.tabs button {
 }
 nav.tabs button.active { background:var(--blue); color:#fff; font-weight:700; }
 
-/* ── 본문 ── */
 main { padding:16px 16px 80px; max-width:640px; margin:0 auto; }
 
-/* ── 추가 버튼 ── */
 .add-btn {
   display:flex; align-items:center; justify-content:center;
   width:100%; background:var(--blue); color:#fff;
@@ -80,7 +76,6 @@ main { padding:16px 16px 80px; max-width:640px; margin:0 auto; }
 }
 .add-btn:active { filter:brightness(.92); }
 
-/* ── 기도 목록 ── */
 .prayer-list { display:flex; flex-direction:column; gap:8px; }
 
 .prayer-item {
@@ -133,13 +128,18 @@ main { padding:16px 16px 80px; max-width:640px; margin:0 auto; }
 .btn-delete { background:var(--red-soft); color:var(--red); }
 .btn-delete:active { background:#fcd5cc; }
 
-/* ── 빈 상태 ── */
 .empty-state {
   text-align:center; padding:50px 20px;
   color:var(--text3); font-size:14px; line-height:1.8;
 }
+.empty-state a {
+  display:inline-block; margin-top:12px;
+  background:var(--blue); color:#fff;
+  font-size:13px; font-weight:600;
+  padding:10px 18px; border-radius:10px;
+  text-decoration:none;
+}
 
-/* ── 추가/수정 모달 패널 ── */
 #overlay {
   position:fixed;
   left:0; right:0; bottom:0;
@@ -189,7 +189,6 @@ main { padding:16px 16px 80px; max-width:640px; margin:0 auto; }
 }
 .btn-modal-save:active { filter:brightness(.92); }
 
-/* ── 응답목록 패널 ── */
 #answerListOverlay {
   position:fixed;
   left:0; right:0; bottom:0;
@@ -206,7 +205,6 @@ main { padding:16px 16px 80px; max-width:640px; margin:0 auto; }
   padding:20px 20px 60px;
 }
 
-/* ── 응답목록 아이템 ── */
 .ans-list-empty {
   text-align:center; padding:40px 0;
   font-size:14px; color:var(--text3); line-height:1.8;
@@ -255,11 +253,11 @@ footer {
   <div class="header-top">
     <div>
       <div class="header-title">기도노트</div>
-      <div class="header-sub">2026 · 그리스도 중심 · 본교회</div>
+      <div class="header-sub" id="headerSub">시작일 맞춤 · 그리스도 중심 · 본교회</div>
     </div>
     <div style="display:flex;gap:8px;">
       <button id="answerListBtn" style="background:var(--green);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;">응답목록</button>
-      <a href="index.html" style="background:var(--blue);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;text-decoration:none;font-family:inherit;">통독표</a>
+      <a href="v2.html" style="background:var(--blue);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;text-decoration:none;font-family:inherit;">통독표</a>
     </div>
   </div>
 </header>
@@ -267,7 +265,6 @@ footer {
 <nav class="tabs" id="tabs"></nav>
 <main id="content"></main>
 
-<!-- 응답목록 패널 -->
 <div id="answerListOverlay">
   <div class="modal">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
@@ -278,7 +275,6 @@ footer {
   </div>
 </div>
 
-<!-- 기도 추가/수정 팝업 모달 -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">기도 제목 추가</div>
@@ -286,7 +282,6 @@ footer {
     <label class="form-label">기도 제목</label>
     <input class="form-input" id="modalInputTitle" type="text" placeholder="기도 제목을 입력하세요">
 
-    <!-- 수정 모드에서만 표시 -->
     <div id="answerSection" style="display:none;">
       <div class="modal-divider"></div>
       <div class="modal-section-title">응답 기록</div>
@@ -310,15 +305,22 @@ footer {
 </footer>
 
 <script>
-const STORAGE_KEY = "prayer2026_notes";
-const MONTH_NAMES = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+const BIBLE_STORAGE_KEY = "bibleReading_flex";
+const STORAGE_KEY = "prayer_flex_notes";
+const READ_DAY_COUNT = 317; // v2.html READ_LIST.length — 동기화 필요
+
+let bibleStore = {};
+try { bibleStore = JSON.parse(localStorage.getItem(BIBLE_STORAGE_KEY)) || {}; } catch(e){}
 
 let data = {};
 try {
   const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
   if(raw && typeof raw === 'object' && !Array.isArray(raw)) data = raw;
 } catch(e){}
-for(let i = 0; i < 12; i++) if(!Array.isArray(data[i])) data[i] = [];
+
+let MONTHS = [];
+const now = new Date();
+let activeMonth = 0;
 
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,5); }
@@ -326,14 +328,69 @@ function escHtml(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-const now = new Date();
-let activeMonth = now.getMonth();
+function monthTabLabel(year, month, startYear){
+  if(year !== startYear) return `${year}년 ${month + 1}월`;
+  return `${month + 1}월`;
+}
 
-/* ── 모달 ── */
-const overlay       = document.getElementById('overlay');
-const modalTitle    = document.getElementById('modalTitle');
-const modalInputTitle   = document.getElementById('modalInputTitle');
-const modalInputWhen    = document.getElementById('modalInputWhen');
+function buildMonthsFromStart(startDateStr){
+  const start = new Date(startDateStr + "T00:00:00");
+  const startYear = start.getFullYear();
+  let cur = new Date(start);
+  const map = new Map();
+  const order = [];
+  for(let i = 0; i < READ_DAY_COUNT; i++){
+    const y = cur.getFullYear();
+    const m = cur.getMonth();
+    const key = `${y}-${m}`;
+    if(!map.has(key)){
+      map.set(key, { year:y, month:m, key, label:monthTabLabel(y, m, startYear) });
+      order.push(key);
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return order.map(k => map.get(k));
+}
+
+function loadMonths(){
+  if(!bibleStore.startDate) return [];
+  if(Array.isArray(bibleStore.monthKeys) && bibleStore.monthKeys.length){
+    const startYear = new Date(bibleStore.startDate + "T00:00:00").getFullYear();
+    return bibleStore.monthKeys.map(key => {
+      const [y, m] = key.split('-').map(Number);
+      return { year:y, month:m, key, label:monthTabLabel(y, m, startYear) };
+    });
+  }
+  return buildMonthsFromStart(bibleStore.startDate);
+}
+
+function ensureMonthData(key){
+  if(!Array.isArray(data[key])) data[key] = [];
+}
+
+function monthKey(){ return MONTHS[activeMonth]?.key; }
+function currentPrayers(){ return data[monthKey()] || []; }
+
+function initMonths(){
+  MONTHS = loadMonths();
+  if(!MONTHS.length){
+    document.getElementById('headerSub').textContent = '시작일 미설정 · 통독표에서 먼저 설정하세요';
+    document.getElementById('tabs').style.display = 'none';
+    return false;
+  }
+  MONTHS.forEach(m => ensureMonthData(m.key));
+  document.getElementById('headerSub').textContent =
+    `${bibleStore.startDate} 시작 · 그리스도 중심 · 본교회`;
+  document.getElementById('tabs').style.display = '';
+  const todayIdx = MONTHS.findIndex(m => m.year === now.getFullYear() && m.month === now.getMonth());
+  activeMonth = todayIdx >= 0 ? todayIdx : 0;
+  return true;
+}
+
+const overlay = document.getElementById('overlay');
+const modalTitle = document.getElementById('modalTitle');
+const modalInputTitle = document.getElementById('modalInputTitle');
+const modalInputWhen = document.getElementById('modalInputWhen');
 const modalInputContent = document.getElementById('modalInputContent');
 const answerSection = document.getElementById('answerSection');
 
@@ -360,7 +417,7 @@ function openAddModal(){
 }
 
 function openEditModal(idx){
-  const p = data[activeMonth][idx];
+  const p = currentPrayers()[idx];
   editingIdx = idx;
   modalTitle.textContent = '기도 제목 수정';
   modalInputTitle.value = p.title;
@@ -379,11 +436,13 @@ document.getElementById('modalCancel').addEventListener('click', closeModal);
 document.getElementById('modalSave').addEventListener('click', () => {
   const title = modalInputTitle.value.trim();
   if(!title){ modalInputTitle.focus(); return; }
+  const key = monthKey();
+  if(!key) return;
 
   if(editingIdx === null){
-    data[activeMonth].push({ id:genId(), title, answeredWhen:'', answeredContent:'' });
+    data[key].push({ id:genId(), title, answeredWhen:'', answeredContent:'' });
   } else {
-    const p = data[activeMonth][editingIdx];
+    const p = data[key][editingIdx];
     p.title = title;
     p.answeredWhen = modalInputWhen.value.trim();
     p.answeredContent = modalInputContent.value.trim();
@@ -391,23 +450,33 @@ document.getElementById('modalSave').addEventListener('click', () => {
   save(); closeModal(); renderContent();
 });
 
-/* ── 탭 ── */
 function renderTabs(){
   const tabsEl = document.getElementById('tabs');
   tabsEl.innerHTML = '';
-  MONTH_NAMES.forEach((name, idx) => {
+  MONTHS.forEach((m, idx) => {
     const btn = document.createElement('button');
-    btn.textContent = name;
+    btn.textContent = m.label;
     if(idx === activeMonth) btn.classList.add('active');
     btn.addEventListener('click', () => { activeMonth = idx; renderAll(); });
     tabsEl.appendChild(btn);
   });
 }
 
-/* ── 본문 ── */
+function renderSetupRequired(){
+  const contentEl = document.getElementById('content');
+  contentEl.innerHTML = `
+    <div class="empty-state">
+      통독표에서 읽기 시작 날짜를 먼저 설정해 주세요.<br>
+      시작일에 맞춰 월별 기도노트가 열립니다.
+      <a href="v2.html">통독표로 이동</a>
+    </div>`;
+}
+
 function renderContent(){
   const contentEl = document.getElementById('content');
   contentEl.innerHTML = '';
+
+  if(!MONTHS.length) return;
 
   const addBtn = document.createElement('button');
   addBtn.className = 'add-btn';
@@ -415,12 +484,13 @@ function renderContent(){
   addBtn.addEventListener('click', openAddModal);
   contentEl.appendChild(addBtn);
 
-  const prayers = data[activeMonth];
+  const prayers = currentPrayers();
+  const monthName = MONTHS[activeMonth].label;
 
   if(prayers.length === 0){
     const emp = document.createElement('div');
     emp.className = 'empty-state';
-    emp.textContent = '이 달의 기도 제목이 없습니다.\n위 버튼을 눌러 추가해보세요.';
+    emp.textContent = `${monthName}의 기도 제목이 없습니다.\n위 버튼을 눌러 추가해보세요.`;
     contentEl.appendChild(emp);
     return;
   }
@@ -458,7 +528,7 @@ function renderContent(){
     btns.querySelector('.btn-edit').addEventListener('click', () => openEditModal(idx));
     btns.querySelector('.btn-delete').addEventListener('click', () => {
       if(confirm('이 기도 제목을 삭제할까요?')){
-        data[activeMonth].splice(idx, 1);
+        data[monthKey()].splice(idx, 1);
         save(); renderContent();
       }
     });
@@ -474,18 +544,19 @@ function renderContent(){
 }
 
 function syncTabsTop(){
-  document.querySelector('nav.tabs').style.top = document.querySelector('header').offsetHeight + 'px';
+  const tabs = document.querySelector('nav.tabs');
+  if(tabs.style.display === 'none') return;
+  tabs.style.top = document.querySelector('header').offsetHeight + 'px';
 }
 
-/* ── 응답목록 팝업 ── */
 const answerListOverlay = document.getElementById('answerListOverlay');
 
 function setAnswerListTop(){
-  const h = document.querySelector('header').offsetHeight;
-  answerListOverlay.style.top = h + 'px';
+  answerListOverlay.style.top = document.querySelector('header').offsetHeight + 'px';
 }
 
 document.getElementById('answerListBtn').addEventListener('click', () => {
+  if(!MONTHS.length) return;
   setAnswerListTop();
   const listEl = document.getElementById('answerListContent');
   listEl.innerHTML = '';
@@ -493,10 +564,10 @@ document.getElementById('answerListBtn').addEventListener('click', () => {
   let totalCount = 0;
   const groups = [];
 
-  MONTH_NAMES.forEach((name, mi) => {
-    const answered = (data[mi] || []).filter(p => p.answeredWhen || p.answeredContent);
+  MONTHS.forEach(m => {
+    const answered = (data[m.key] || []).filter(p => p.answeredWhen || p.answeredContent);
     if(answered.length > 0){
-      groups.push({ name, mi, items: answered });
+      groups.push({ name:m.label, items:answered });
       totalCount += answered.length;
     }
   });
@@ -536,14 +607,21 @@ window.addEventListener('resize', () => { if(answerListOverlay.classList.contain
 
 document.getElementById('resetBtn').addEventListener('click', () => {
   if(confirm('모든 기도 내용을 초기화할까요?\n이 작업은 되돌릴 수 없습니다.')){
-    for(let i = 0; i < 12; i++) data[i] = [];
+    MONTHS.forEach(m => { data[m.key] = []; });
     save(); renderAll();
   }
 });
 
-function renderAll(){ renderTabs(); renderContent(); syncTabsTop(); }
+function renderAll(){
+  if(!MONTHS.length) return;
+  renderTabs();
+  renderContent();
+  syncTabsTop();
+}
+
 window.addEventListener('resize', syncTabsTop);
-renderAll();
+if(!initMonths()) renderSetupRequired();
+else renderAll();
 </script>
 </body>
 </html>
