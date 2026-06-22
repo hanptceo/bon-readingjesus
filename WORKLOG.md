@@ -46,7 +46,7 @@ PC·장소가 바뀌어도 Cursor Agent가 맥락을 잡을 수 있도록, **짧
 
 ## 현재 상태 (한 줄)
 
-**2026-06-22** — `prayer-note2`, UI 조정, README·WORKLOG 정리. 커밋 `97908e6` push 완료 예정.
+**2026-06-22** — `prayer-note2`, UI 조정, README·WORKLOG 정리. `main` push 완료 (`91c6d69`).
 
 **브랜치:** `main` (`origin/main`)
 
@@ -81,7 +81,7 @@ PC·장소가 바뀌어도 Cursor Agent가 맥락을 잡을 수 있도록, **짧
 - 전체 HTML footer — `Last updated 2026.06.22`
 - `README.md` 작성, `WORKLOG.md` 정리
 
-**Git:** `97908e6`
+**Git:** `91c6d69`
 
 ---
 
